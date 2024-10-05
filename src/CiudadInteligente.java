@@ -1,3 +1,12 @@
+/*
+ * Interfaz de la ciudad inteligente
+ * 
+ * @author Laura Murillas
+ * @author Natalia
+ */
+
+@author LauraMurillas
+@author Natalia 
 import java.util.Scanner;
 
 public class CiudadInteligente {
