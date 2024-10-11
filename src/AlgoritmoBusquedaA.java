@@ -12,14 +12,15 @@
  * pero penalizando la distancia a las casillas con tráfico medio (3) y pesado (4) 
  * para que el algoritmo prefiera rutas con tráfico liviano (0).
  * 
- * Formula: h(n)= ∣ X actual​ − X objetivo ​∣ + ∣ Y actual​ − Y objetivo ​∣
+ * Formula: h|(n)= ∣ X actual​ − X objetivo ​∣ + ∣ Y actual​ − Y objetivo ​∣
 */
 
 import java.util.*;
+import java.util.*;
 
-class AStarSearch {
-    
-    // Clase para representar las coordenadas de los nodos
+public class AlgoritmoBusquedaA {
+
+    // Clase para representar los nodos (coordenadas) y el costo acumulado
     static class Node implements Comparable<Node> {
         int x, y;  // Coordenadas del nodo
         int g;     // Costo acumulado desde el inicio
@@ -59,7 +60,7 @@ class AStarSearch {
         return Math.abs(x1 - x2) + Math.abs(y1 - y2);
     }
 
-    // Función para ejecutar A*
+    // Función para ejecutar A* entre dos puntos
     public static List<Node> AStar(int[][] grid, int[] start, int[] goal) {
         int rows = grid.length;
         int cols = grid[0].length;
@@ -159,20 +160,35 @@ class AStarSearch {
         // Punto de partida del vehículo
         int[] start = {2, 0};
         
+        // Posición del pasajero
+        int[] passenger = {6, 0};
+        
         // Destino del pasajero
         int[] goal = {5, 9};
+
+        // 1. Buscar el mejor camino desde el vehículo hasta el pasajero
+        List<Node> pathToPassenger = AStar(grid, start, passenger);
         
-        // Ejecutar A*
-        List<Node> path = AStar(grid, start, goal);
-        
-        // Imprimir el camino
-        if (path != null) {
-            System.out.println("Camino encontrado:");
-            for (Node node : path) {
+        if (pathToPassenger != null) {
+            System.out.println("Camino al pasajero:");
+            for (Node node : pathToPassenger) {
                 System.out.println("[" + node.x + ", " + node.y + "]");
             }
         } else {
-            System.out.println("No se encontró un camino.");
+            System.out.println("No se encontró un camino al pasajero.");
+            return;
+        }
+        
+        // 2. Buscar el mejor camino desde el pasajero hasta el destino
+        List<Node> pathToGoal = AStar(grid, passenger, goal);
+        
+        if (pathToGoal != null) {
+            System.out.println("Camino al destino:");
+            for (Node node : pathToGoal) {
+                System.out.println("[" + node.x + ", " + node.y + "]");
+            }
+        } else {
+            System.out.println("No se encontró un camino al destino.");
         }
     }
 }

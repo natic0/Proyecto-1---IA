@@ -5,9 +5,9 @@
  * @author Natalia
  */
 
-@author LauraMurillas
-@author Natalia 
+
 import java.util.Scanner;
+
 
 public class CiudadInteligente {
 
@@ -53,7 +53,7 @@ public class CiudadInteligente {
                 //función de busqueda no informada
                 break;
             case 2:
-                System.out.println("Busqueda informada");
+                //AStarSearch()
             default:
                 System.out.println("Opción inválida");
                 break;
