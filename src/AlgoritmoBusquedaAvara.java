@@ -1,39 +1,39 @@
 /*
-    Algoritmo de Busqueda informada A*
+    Algoritmo de Busqueda informada Avara
 
- * Heuristica: La distancia Manhattan desde el nodo actual al objetivo,
- * pero penalizando la distancia a las casillas con tráfico medio (3) y pesado (4) 
- * para que el algoritmo prefiera rutas con tráfico liviano (0).
- * 
- * Formula: h|(n)= ∣ X actual​ − X objetivo ​∣ + ∣ Y actual​ − Y objetivo ​∣
+ * Heuristica: Greedy Best Firts
+ * consiste en escoger los nodos con menor distancia al destino del pasajero
+ * En esta heuristica no se considera la penalizacion por el tráfico para escoger el camino
 */
 
 import java.util.*;
 
-public class AlgoritmoBusquedaA {
 
-    // funcion para representar los nodos (coordenadas) y el costo acumulado
+public class AlgoritmoBusquedaAvara{
+
+    // Clase para representar los nodos
     static class Node implements Comparable<Node> {
-        int x, y;  // Estas son las coordenadas del nodo
-        int g;     // Costo acumulado contando el inicio
-        int f;     // Costo estimado total (g + h)
-        
-        Node parent;  // Para reconstruir el camino
-        
-        public Node(int x, int y, int g, int f, Node parent) {
+
+        // Coordenadas del nodo
+        int x, y;  
+
+        // Valor heurístico 
+        int h;     
+
+        // Para reconstruir el camino
+        Node parent;  
+
+        public Node(int x, int y, int h, Node parent) {
             this.x = x;
             this.y = y;
-            this.g = g;
-            this.f = f;
+            this.h = h;
             this.parent = parent;
         }
 
-
-        
-        // Para comparar por el costo total f(n)
+        // Comparar solo por la heurística
         @Override
         public int compareTo(Node other) {
-            return Integer.compare(this.f, other.f);  
+            return Integer.compare(this.h, other.h);  
         }
 
         @Override
@@ -50,62 +50,55 @@ public class AlgoritmoBusquedaA {
         }
     }
 
-    // Heurística: Distancia Manhattan
+    // Heurística para considerar en el camino mas corto a la meta (distancia mannhattan)
     public static int heuristic(int x1, int y1, int x2, int y2) {
-        return Math.abs(x1 - x2) + Math.abs(y1 - y2);
+        return Math.abs(x1 - x2) + Math.abs(y1 - y2);  
     }
 
-    // Función para ejecutar A* entre dos puntos
-    public static List<Node> AStar(int[][] grid, int[] start, int[] goal) {
+    // Función de busqueda Greedy Best Firts
+    public static List<Node> greedyBestFirstSearch(int[][] grid, int[] start, int[] goal) {
         int rows = grid.length;
         int cols = grid[0].length;
 
-        // Lista de los nodos a expandir
+        // Selecciona el nodo con menor heurística
         PriorityQueue<Node> openList = new PriorityQueue<>();
         
-        // Nodos ya explorados
+        //Almacena los nodos ya explorados
         Set<Node> closedList = new HashSet<>();
         
         // Nodo inicial
-        Node startNode = new Node(start[0], start[1], 0, 0, null);
+        Node startNode = new Node(start[0], start[1], heuristic(start[0], start[1], goal[0], goal[1]), null);
         openList.add(startNode);
         
-        // Movimientos posibles (arriba, abajo, izquierda, derecha)
+        // Movimientos posibles
         int[][] directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
         
-        
         while (!openList.isEmpty()) {
-            // Nodo con menor f(n)
+            // Nodo con menor h(n)
             Node current = openList.poll();  
 
-            // Si se ha llegado al objetivo
+            // Si hemos llegado al objetivo
             if (current.x == goal[0] && current.y == goal[1]) {
                 return reconstructPath(current);
             }
             
             closedList.add(current);
 
-            // Expandir los vecinos (sucesores)
+            // Expandir los nodos vecinos
             for (int[] direction : directions) {
                 int newX = current.x + direction[0];
                 int newY = current.y + direction[1];
                 
-                // Verificar si el vecino está dentro del rango y no es un muro
+                //verifca si el vecino está dentro del rango y no es un muro
                 if (newX >= 0 && newX < rows && newY >= 0 && newY < cols && grid[newX][newY] != 1) {
-                    // Calcular el costo de moverse al vecino
-                    int movementCost = getMovementCost(grid[newX][newY]);
-                    int tentativeG = current.g + movementCost;
+                    Node neighbor = new Node(newX, newY, heuristic(newX, newY, goal[0], goal[1]), current);
                     
-                    Node neighbor = new Node(newX, newY, tentativeG, 0, current);
-                    
+                    // Si ya hemos pasado por ese nodo
                     if (closedList.contains(neighbor)) {
-                        continue;  // Ya hemos explorado este nodo
+                        continue;  
                     }
                     
-                    // Calcular f(n) = g(n) + h(n)
-                    neighbor.f = tentativeG + heuristic(newX, newY, goal[0], goal[1]);
-
-                    // Si el vecino no está en la openList o encontramos un camino mejor
+                    // Si el vecino no está en la openList, agregarlo
                     if (!openList.contains(neighbor)) {
                         openList.add(neighbor);
                     }
@@ -113,18 +106,8 @@ public class AlgoritmoBusquedaA {
             }
         }
         
-        // Si no se encuentra solución
-        return null;  
-    }
-
-    // Función auxiliar para obtener el costo de moverse a una casilla
-    public static int getMovementCost(int cellType) {
-        switch (cellType) {
-            case 0: return 1;  
-            case 3: return 4;  
-            case 4: return 7;  
-            default: return 1;  
-        }
+         // Si no se encuentra solución
+        return null; 
     }
 
     // Función para reconstruir el camino desde el objetivo hasta el inicio
@@ -135,9 +118,17 @@ public class AlgoritmoBusquedaA {
             path.add(current);
             current = current.parent;
         }
-        //Se invierte el camino pq se construyó al revés
-        Collections.reverse(path);
+        // El camino se construye al revés, así que lo invertimos
+        Collections.reverse(path);  
         return path;
+    }
+
+    // Función para imprimir el camino
+    public static void printPath(List<Node> path) {
+        System.out.println("Camino encontrado:");
+        for (Node node : path) {
+            System.out.println("[" + node.x + ", " + node.y + "]");
+        }
     }
 
     // Main de prueba
@@ -166,28 +157,24 @@ public class AlgoritmoBusquedaA {
         int[] goal = {5, 9};
 
         //Busca el mejor camino desde el vehículo hasta el pasajero
-        List<Node> pathToPassenger = AStar(grid, start, passenger);
+        System.out.println("Camino al pasajero:");
+        List<Node> pathToPassenger = greedyBestFirstSearch(grid, start, passenger);
         
         if (pathToPassenger != null) {
-            System.out.println("Camino al pasajero:");
-            for (Node node : pathToPassenger) {
-                System.out.println("[" + node.x + ", " + node.y + "]");
-            }
+            printPath(pathToPassenger);
         } else {
             System.out.println("No se encontró un camino al pasajero.");
-            return;
         }
         
         //Busca el mejor camino desde el pasajero hasta el destino
-        List<Node> pathToGoal = AStar(grid, passenger, goal);
+        System.out.println("\nCamino al destino:");
+        List<Node> pathToGoal = greedyBestFirstSearch(grid, passenger, goal);
         
         if (pathToGoal != null) {
-            System.out.println("Camino al destino:");
-            for (Node node : pathToGoal) {
-                System.out.println("[" + node.x + ", " + node.y + "]");
-            }
+            printPath(pathToGoal);
         } else {
             System.out.println("No se encontró un camino al destino.");
         }
     }
 }
+
