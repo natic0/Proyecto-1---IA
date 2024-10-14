@@ -53,7 +53,7 @@ public class CiudadInteligente {
                 //función de busqueda no informada
                 break;
             case 2:
-                //AStarSearch()
+                //AlgoritmoBusquedaA()
             default:
                 System.out.println("Opción inválida");
                 break;

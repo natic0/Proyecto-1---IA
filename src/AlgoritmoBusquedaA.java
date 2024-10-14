@@ -2,12 +2,7 @@
     Algoritmo de Busqueda informada A*
     @author Natalia
     @author LauraMurillas
-
- * Definiciones del problema:
- * Estado inicial: La casilla donde está el vehículo autónomo (representada con un 2 en la matriz).
- * Estado objetivo: La casilla donde está el destino del pasajero (representada con un 6 en la matriz).
- * 
- * 
+ 
  * Heuristica: La distancia Manhattan desde el nodo actual al objetivo,
  * pero penalizando la distancia a las casillas con tráfico medio (3) y pesado (4) 
  * para que el algoritmo prefiera rutas con tráfico liviano (0).
@@ -16,14 +11,13 @@
 */
 
 import java.util.*;
-import java.util.*;
 
 public class AlgoritmoBusquedaA {
 
-    // Clase para representar los nodos (coordenadas) y el costo acumulado
+    // funcion para representar los nodos (coordenadas) y el costo acumulado
     static class Node implements Comparable<Node> {
-        int x, y;  // Coordenadas del nodo
-        int g;     // Costo acumulado desde el inicio
+        int x, y;  // Estas son las coordenadas del nodo
+        int g;     // Costo acumulado contando el inicio
         int f;     // Costo estimado total (g + h)
         
         Node parent;  // Para reconstruir el camino
@@ -35,10 +29,13 @@ public class AlgoritmoBusquedaA {
             this.f = f;
             this.parent = parent;
         }
+
+
         
+        // Para comparar por el costo total f(n)
         @Override
         public int compareTo(Node other) {
-            return Integer.compare(this.f, other.f);  // Comparar por el costo total f(n)
+            return Integer.compare(this.f, other.f);  
         }
 
         @Override
@@ -55,7 +52,7 @@ public class AlgoritmoBusquedaA {
         }
     }
 
-    // Distancia Manhattan como heurística
+    // Heurística: Distancia Manhattan
     public static int heuristic(int x1, int y1, int x2, int y2) {
         return Math.abs(x1 - x2) + Math.abs(y1 - y2);
     }
@@ -65,10 +62,10 @@ public class AlgoritmoBusquedaA {
         int rows = grid.length;
         int cols = grid[0].length;
 
-        // Cola de prioridad para los nodos a expandir
+        // Lista de los nodos a expandir
         PriorityQueue<Node> openList = new PriorityQueue<>();
         
-        // Conjunto para nodos ya explorados
+        // Nodos ya explorados
         Set<Node> closedList = new HashSet<>();
         
         // Nodo inicial
@@ -78,10 +75,12 @@ public class AlgoritmoBusquedaA {
         // Movimientos posibles (arriba, abajo, izquierda, derecha)
         int[][] directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
         
+        
         while (!openList.isEmpty()) {
-            Node current = openList.poll();  // Nodo con menor f(n)
+            // Nodo con menor f(n)
+            Node current = openList.poll();  
 
-            // Si hemos llegado al objetivo
+            // Si se ha llegado al objetivo
             if (current.x == goal[0] && current.y == goal[1]) {
                 return reconstructPath(current);
             }
@@ -116,16 +115,17 @@ public class AlgoritmoBusquedaA {
             }
         }
         
-        return null;  // Si no se encuentra solución
+        // Si no se encuentra solución
+        return null;  
     }
 
     // Función auxiliar para obtener el costo de moverse a una casilla
     public static int getMovementCost(int cellType) {
         switch (cellType) {
-            case 0: return 1;  // Tráfico liviano
-            case 3: return 4;  // Tráfico medio
-            case 4: return 7;  // Tráfico pesado
-            default: return 1;  // Casillas no específicas
+            case 0: return 1;  
+            case 3: return 4;  
+            case 4: return 7;  
+            default: return 1;  
         }
     }
 
@@ -137,7 +137,8 @@ public class AlgoritmoBusquedaA {
             path.add(current);
             current = current.parent;
         }
-        Collections.reverse(path);  // El camino se construye al revés, así que lo invertimos
+        //Se invierte el camino pq se construyó al revés
+        Collections.reverse(path);
         return path;
     }
 
