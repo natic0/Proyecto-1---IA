@@ -1,7 +1,7 @@
 # Proyecto: SMART CAR WORLD
 
 ## Autores
-Angie Natalia Cordoba Collazos - 2124366
+Angie Natalia Cordoba Collazos - 2124366 |
 Laura Murillas Andrade - 201944153
 
 ## Descripción
