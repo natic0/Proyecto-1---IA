@@ -1,5 +1,9 @@
 # Proyecto: SMART CAR WORLD
 
+## Autores
+Angie Natalia Cordoba Collazos - 2124366
+Laura Murillas Andrade - 201944153
+
 ## Descripción
 
 Este proyecto fue desarrollado como parte de la materia de **Inteligencia Artificial**, donde se implementaron diferentes algoritmos de búsqueda tanto informada como no informada. El objetivo del proyecto es simular un vehículo inteligente que debe recoger a un pasajero y llevarlo a su destino, utilizando diferentes estrategias de búsqueda.
