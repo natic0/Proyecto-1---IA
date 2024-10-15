@@ -1,16 +1,23 @@
 import java.util.*;
 
+import org.w3c.dom.Node;
+
 public class AlgoritmoBusquedaAmplitud {
+
+    private static int expandedNodes;  // Variable para contar nodos expandidos
+    private static int maxDepth;       // Variable para almacenar la profundidad máxima alcanzada
 
     static class Node {
         int x, y;           // Coordenadas del nodo en el grid
         Node parent;        // Nodo padre desde el cual se llegó a este nodo
+        int depth;          // Profundidad del nodo en el árbol
 
         // Constructor que inicializa las coordenadas y el nodo padre
-        public Node(int x, int y, Node parent) {
+        public Node(int x, int y, Node parent, int depth) {
             this.x = x;
             this.y = y;
             this.parent = parent;
+            this.depth = depth; // Inicializa la profundidad
         }
 
         // Método para comparar nodos (necesario para almacenar en un conjunto)
@@ -41,17 +48,23 @@ public class AlgoritmoBusquedaAmplitud {
         Set<Node> visited = new HashSet<>();
         
         // Nodo inicial basado en las coordenadas de inicio
-        Node startNode = new Node(start[0], start[1], null);
+        Node startNode = new Node(start[0], start[1], null, 0);
         queue.add(startNode); // Agregar el nodo inicial a la cola
         visited.add(startNode); // Marcar el nodo inicial como visitado
         
         // Movimientos posibles (arriba, abajo, izquierda, derecha)
         int[][] directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
 
+        expandedNodes = 0; // Inicializa el contador de nodos expandidos
+        maxDepth = 0; // Inicializa la profundidad máxima
+
+
         // Bucle de búsqueda
         while (!queue.isEmpty()) {
             // Extraer el nodo de la cola
             Node current = queue.poll();
+            expandedNodes++; // Incrementa el contador de nodos expandidos
+            maxDepth = Math.max(maxDepth, current.depth); // Actualiza la profundidad máxima
 
             // Si hemos llegado al objetivo
             if (current.x == goal[0] && current.y == goal[1]) {
@@ -66,7 +79,7 @@ public class AlgoritmoBusquedaAmplitud {
 
                 // Verificar si el vecino está dentro del rango y no es un muro
                 if (newX >= 0 && newX < rows && newY >= 0 && newY < cols && grid[newX][newY] != 1) {
-                    Node neighbor = new Node(newX, newY, current); // Crear un nuevo nodo vecino
+                    Node neighbor = new Node(newX, newY, current, current.depth + 1); // Crear un nuevo nodo vecino
 
                     // Si no ha sido visitado, agregarlo a la cola
                     if (!visited.contains(neighbor)) {
@@ -94,56 +107,12 @@ public class AlgoritmoBusquedaAmplitud {
         return path; // Devolver el camino reconstruido
     }
 
-    // Método principal para probar el algoritmo
-    public static void main(String[] args) {
-        // Definición del grid (10x10)
-        int[][] grid = {
-            {0, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-            {0, 1, 1, 0, 0, 0, 4, 0, 0, 0},
-            {2, 1, 1, 0, 1, 0, 1, 0, 1, 0},
-            {0, 3, 3, 0, 4, 0, 0, 0, 4, 0},
-            {0, 1, 1, 0, 1, 1, 1, 1, 1, 0},
-            {0, 0, 0, 0, 1, 1, 0, 0, 0, 6},
-            {5, 1, 1, 1, 1, 1, 0, 1, 1, 1},
-            {0, 1, 0, 0, 0, 1, 0, 0, 0, 1},
-            {0, 1, 0, 1, 0, 1, 1, 1, 0, 1},
-            {0, 0, 0, 1, 0, 0, 0, 0, 0, 1}
-        };
+     // Métodos para obtener información sobre los nodos expandidos y la profundidad
+     public static int getExpandedNodes() {
+        return expandedNodes;
+    }
 
-        // Punto de partida del vehículo
-        int[] start = {2, 0};
-
-        // Posición del pasajero
-        int[] passenger = {6, 0};
-
-        // Destino del pasajero
-        int[] goal = {5, 9};
-
-        // Buscar el camino desde el vehículo hasta el pasajero
-        List<Node> pathToPassenger = breadthFirstSearch(grid, start, passenger);
-
-        // Mostrar el camino encontrado o un mensaje de error
-        if (pathToPassenger != null) {
-            System.out.println("Camino al pasajero:");
-            for (Node node : pathToPassenger) {
-                System.out.println("[" + node.x + ", " + node.y + "]");
-            }
-        } else {
-            System.out.println("No se encontró un camino al pasajero.");
-            return;
-        }
-
-        // Buscar el camino desde el pasajero hasta el destino
-        List<Node> pathToGoal = breadthFirstSearch(grid, passenger, goal);
-
-        // Mostrar el camino encontrado o un mensaje de error
-        if (pathToGoal != null) {
-            System.out.println("Camino al destino:");
-            for (Node node : pathToGoal) {
-                System.out.println("[" + node.x + ", " + node.y + "]");
-            }
-        } else {
-            System.out.println("No se encontró un camino al destino.");
-        }
+    public static int getDepth() {
+        return maxDepth;
     }
 }

@@ -12,6 +12,10 @@ import java.util.*;
 
 public class AlgoritmoBusquedaA {
 
+    private static int expandedNodes;  // Variable para contar nodos expandidos
+    private static int maxDepth;  // Profundidad máxima del árbol
+    private static int cost;  // Costo de la solución
+
     // funcion para representar los nodos (coordenadas) y el costo acumulado
     static class Node implements Comparable<Node> {
         int x, y;  // Estas son las coordenadas del nodo
@@ -19,13 +23,16 @@ public class AlgoritmoBusquedaA {
         int f;     // Costo estimado total (g + h)
         
         Node parent;  // Para reconstruir el camino
+
+        int depth; // Profundidad del nodo en el árbol
         
-        public Node(int x, int y, int g, int f, Node parent) {
+        public Node(int x, int y, int g, int f, Node parent, int depth) {
             this.x = x;
             this.y = y;
             this.g = g;
             this.f = f;
             this.parent = parent;
+            this.depth = depth; // Establecer profundidad del nodo
         }
 
 
@@ -67,23 +74,40 @@ public class AlgoritmoBusquedaA {
         Set<Node> closedList = new HashSet<>();
         
         // Nodo inicial
-        Node startNode = new Node(start[0], start[1], 0, 0, null);
-        openList.add(startNode);
+        Node startNode = new Node(start[0], start[1], 0, 0, null, 0); // Inicializa el nodo de inicio con costo 0 y profundidad 0
+        openList.add(startNode);  // Añade el nodo inicial a la lista abierta
         
         // Movimientos posibles (arriba, abajo, izquierda, derecha)
         int[][] directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+
+        expandedNodes = 0; // Contador de nodos expandidos
+
+        long startTime = System.nanoTime(); // Iniciar el temporizador
         
         
         while (!openList.isEmpty()) {
             // Nodo con menor f(n)
             Node current = openList.poll();  
+            expandedNodes++; // Incrementar el contador de nodos expandidos
 
             // Si se ha llegado al objetivo
             if (current.x == goal[0] && current.y == goal[1]) {
-                return reconstructPath(current);
+                long endTime = System.nanoTime(); // Finalizar el temporizador
+                long duration = endTime - startTime; // Calcular duración en nanosegundos
+                maxDepth = current.depth; // Actualiza la profundidad máxima
+                cost = current.g; // Actualiza el costo de la solución
+
+                // Mostrar reporte
+                System.out.println("Reporte:");
+                System.out.println("Cantidad de nodos expandidos: " + expandedNodes);
+                System.out.println("Profundidad del árbol: " + maxDepth);
+                System.out.println("Tiempo de cómputo: " + (duration / 1_000_000) + " ms"); // Convertir a milisegundos
+                System.out.println("Costo de la solución encontrada: " + current.g);
+
+                return reconstructPath(current);  // Reconstruir el camino desde el nodo objetivo
             }
             
-            closedList.add(current);
+            closedList.add(current); // Añadir el nodo actual a la lista cerrada
 
             // Expandir los vecinos (sucesores)
             for (int[] direction : directions) {
@@ -96,7 +120,7 @@ public class AlgoritmoBusquedaA {
                     int movementCost = getMovementCost(grid[newX][newY]);
                     int tentativeG = current.g + movementCost;
                     
-                    Node neighbor = new Node(newX, newY, tentativeG, 0, current);
+                    Node neighbor = new Node(newX, newY, tentativeG, 0, current,  current.depth + 1);
                     
                     if (closedList.contains(neighbor)) {
                         continue;  // Ya hemos explorado este nodo
@@ -117,6 +141,18 @@ public class AlgoritmoBusquedaA {
         return null;  
     }
 
+    public static int getExpandedNodes() {
+        return expandedNodes;  // Retorna el número de nodos expandidos
+    }
+
+    public static int getDepth() {
+        return maxDepth;  // Retorna la profundidad máxima
+    }
+
+    public static int getCost() {
+        return cost;  // Retorna el costo de la solución
+    }
+
     // Función auxiliar para obtener el costo de moverse a una casilla
     public static int getMovementCost(int cellType) {
         switch (cellType) {
@@ -129,65 +165,14 @@ public class AlgoritmoBusquedaA {
 
     // Función para reconstruir el camino desde el objetivo hasta el inicio
     public static List<Node> reconstructPath(Node goal) {
-        List<Node> path = new ArrayList<>();
-        Node current = goal;
+        List<Node> path = new ArrayList<>();//Lista para almacenar el camino
+        Node current = goal; //Comienza desde el nodo objetivo
         while (current != null) {
-            path.add(current);
-            current = current.parent;
+            path.add(current); // Añade el nodo actual al camino
+            current = current.parent; // Mueve al nodo padre
         }
         //Se invierte el camino pq se construyó al revés
         Collections.reverse(path);
-        return path;
-    }
-
-    // Main de prueba
-    public static void main(String[] args) {
-        // Definición del grid (10x10)
-        int[][] grid = {
-            {0, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-            {0, 1, 1, 0, 0, 0, 4, 0, 0, 0},
-            {2, 1, 1, 0, 1, 0, 1, 0, 1, 0},
-            {0, 3, 3, 0, 4, 0, 0, 0, 4, 0},
-            {0, 1, 1, 0, 1, 1, 1, 1, 1, 0},
-            {0, 0, 0, 0, 1, 1, 0, 0, 0, 6},
-            {5, 1, 1, 1, 1, 1, 0, 1, 1, 1},
-            {0, 1, 0, 0, 0, 1, 0, 0, 0, 1},
-            {0, 1, 0, 1, 0, 1, 1, 1, 0, 1},
-            {0, 0, 0, 1, 0, 0, 0, 0, 0, 1}
-        };
-        
-        // Punto de partida del vehículo
-        int[] start = {2, 0};
-        
-        // Posición del pasajero
-        int[] passenger = {6, 0};
-        
-        // Destino del pasajero
-        int[] goal = {5, 9};
-
-        //Busca el mejor camino desde el vehículo hasta el pasajero
-        List<Node> pathToPassenger = AStar(grid, start, passenger);
-        
-        if (pathToPassenger != null) {
-            System.out.println("Camino al pasajero:");
-            for (Node node : pathToPassenger) {
-                System.out.println("[" + node.x + ", " + node.y + "]");
-            }
-        } else {
-            System.out.println("No se encontró un camino al pasajero.");
-            return;
-        }
-        
-        //Busca el mejor camino desde el pasajero hasta el destino
-        List<Node> pathToGoal = AStar(grid, passenger, goal);
-        
-        if (pathToGoal != null) {
-            System.out.println("Camino al destino:");
-            for (Node node : pathToGoal) {
-                System.out.println("[" + node.x + ", " + node.y + "]");
-            }
-        } else {
-            System.out.println("No se encontró un camino al destino.");
-        }
+        return path; // Retorna el camino reconstruido
     }
 }

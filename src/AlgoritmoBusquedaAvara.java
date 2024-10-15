@@ -11,6 +11,9 @@ import java.util.*;
 
 public class AlgoritmoBusquedaAvara{
 
+    private static int expandedNodes;  // Variable para contar nodos expandidos
+    private static int maxDepth;       // Variable para almacenar la profundidad máxima alcanzada
+
     // Clase para representar los nodos
     static class Node implements Comparable<Node> {
 
@@ -23,11 +26,15 @@ public class AlgoritmoBusquedaAvara{
         // Para reconstruir el camino
         Node parent;  
 
+        // Profundidad del nodo
+        int depth;  
+
         public Node(int x, int y, int h, Node parent) {
             this.x = x;
             this.y = y;
             this.h = h;
             this.parent = parent;
+            this.depth = parent != null ? parent.depth + 1 : 0; // Establece la profundidad
         }
 
         // Comparar solo por la heurística
@@ -72,10 +79,15 @@ public class AlgoritmoBusquedaAvara{
         
         // Movimientos posibles
         int[][] directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+
+        expandedNodes = 0; // Inicializa el contador de nodos expandidos
+        maxDepth = 0; // Inicializa la profundidad máxima
         
         while (!openList.isEmpty()) {
             // Nodo con menor h(n)
             Node current = openList.poll();  
+            expandedNodes++; // Incrementa el contador de nodos expandidos
+            maxDepth = Math.max(maxDepth, current.depth); // Actualiza la profundidad máxima
 
             // Si hemos llegado al objetivo
             if (current.x == goal[0] && current.y == goal[1]) {
@@ -129,52 +141,14 @@ public class AlgoritmoBusquedaAvara{
         for (Node node : path) {
             System.out.println("[" + node.x + ", " + node.y + "]");
         }
+    }// Métodos para obtener información sobre los nodos expandidos y la profundidad
+    public static int getExpandedNodes() {
+        return expandedNodes;
     }
 
-    // Main de prueba
-    public static void main(String[] args) {
-        // Definición del grid (10x10)
-        int[][] grid = {
-            {0, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-            {0, 1, 1, 0, 0, 0, 4, 0, 0, 0},
-            {2, 1, 1, 0, 1, 0, 1, 0, 1, 0},
-            {0, 3, 3, 0, 4, 0, 0, 0, 4, 0},
-            {0, 1, 1, 0, 1, 1, 1, 1, 1, 0},
-            {0, 0, 0, 0, 1, 1, 0, 0, 0, 6},
-            {5, 1, 1, 1, 1, 1, 0, 1, 1, 1},
-            {0, 1, 0, 0, 0, 1, 0, 0, 0, 1},
-            {0, 1, 0, 1, 0, 1, 1, 1, 0, 1},
-            {0, 0, 0, 1, 0, 0, 0, 0, 0, 1}
-        };
-        
-        // Punto de partida del vehículo
-        int[] start = {2, 0};
-        
-        // Posición del pasajero
-        int[] passenger = {6, 0};
-        
-        // Destino del pasajero
-        int[] goal = {5, 9};
-
-        //Busca el mejor camino desde el vehículo hasta el pasajero
-        System.out.println("Camino al pasajero:");
-        List<Node> pathToPassenger = greedyBestFirstSearch(grid, start, passenger);
-        
-        if (pathToPassenger != null) {
-            printPath(pathToPassenger);
-        } else {
-            System.out.println("No se encontró un camino al pasajero.");
-        }
-        
-        //Busca el mejor camino desde el pasajero hasta el destino
-        System.out.println("\nCamino al destino:");
-        List<Node> pathToGoal = greedyBestFirstSearch(grid, passenger, goal);
-        
-        if (pathToGoal != null) {
-            printPath(pathToGoal);
-        } else {
-            System.out.println("No se encontró un camino al destino.");
-        }
+    public static int getDepth() {
+        return maxDepth;
     }
+
 }
 
