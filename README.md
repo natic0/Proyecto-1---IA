@@ -1,4 +1,4 @@
-# Proyecto: Algoritmos de Búsqueda para un Vehículo Inteligente
+# Proyecto: SMART CAR WORLD
 
 ## Descripción
 
@@ -23,7 +23,7 @@ Para ejecutar el proyecto, simplemente sigue estos pasos:
 2. Selecciona el tipo de búsqueda que deseas utilizar:
    - **Búsqueda No Informada** (Amplitud, Profundidad evitando ciclos, Costo Uniforme).
    - **Búsqueda Informada** (A*, Avara).
-3. Puedes personalizar el "mundo" del vehículo, donde se definirán las posiciones iniciales del vehículo, del pasajero y del destino. Esto se puede hacer dentro del código de `SmartCarWorld.java`.
+3. Puedes personalizar el "mundo" del vehículo, donde se definirán las posiciones iniciales del vehículo, del pasajero y del destino. Esto se puede hacer cargando el mapa desde la interfaz de `SmartCarWorld.java`.
 
 ## Requisitos
 
@@ -36,3 +36,14 @@ Para ejecutar el proyecto, simplemente sigue estos pasos:
 
    ```bash
    git clone https://github.com/tu-usuario/nombre-del-repo.git
+
+2. Compila el archivo SmartCarWorld.java:
+    
+    ```bash
+    javac SmartCarWorld.java
+
+3. Ejecuta el programa:
+
+    ```bash
+    java SmartCarWorld
+
